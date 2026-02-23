@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workout Advisor</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%232563eb'/%3E%3Ctext x='16' y='22' font-size='18' font-family='system-ui,sans-serif' font-weight='700' fill='white' text-anchor='middle'%3EW%3C/text%3E%3C/svg%3E" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      background: #f8fafc;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      color: #1e293b;
+    }
+
+    /* -- Header -- */
+    header {
+      position: relative; z-index: 10;
+      display: flex; align-items: center; justify-content: center;
+      padding: 1.1rem 1.5rem;
+      border-bottom: 1px solid #e2e8f0;
+      background: #fff;
+      flex-shrink: 0; gap: 1rem;
+    }
+    .logo {
+      width: 36px; height: 36px; border-radius: 10px;
+      background: linear-gradient(135deg, #2563eb, #3b82f6);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: 700; color: #fff; flex-shrink: 0;
+    }
+    .header-title { font-size: 1rem; font-weight: 600; color: #0f172a; }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 0.35rem;
+      font-size: 0.68rem; font-weight: 600; letter-spacing: 0.06em;
+      text-transform: uppercase; color: #2563eb;
+      background: #eff6ff; border: 1px solid #bfdbfe;
+      border-radius: 100px; padding: 0.25rem 0.7rem;
+    }
+    .badge-dot { width: 5px; height: 5px; border-radius: 50%; background: #2563eb; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    /* -- Main -- */
+    main { position: relative; z-index: 1; flex: 1; display: flex; flex-direction: column; align-items: center; padding: 2.5rem 1rem 4rem; }
+    .content { width: 100%; max-width: 860px; }
+
+    /* -- Card -- */
+    .card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+    .card + .card { margin-top: 1rem; }
+
+    /* -- Form state -- */
+    .form-hero { text-align: center; margin-bottom: 2rem; }
+    .form-hero h1 { font-size: 1.5rem; font-weight: 700; color: #0f172a; letter-spacing: -0.02em; margin-bottom: 0.5rem; }
+    .form-hero h1 span { color: #2563eb; }
+    .form-hero p { font-size: 0.88rem; color: #64748b; max-width: 500px; margin: 0 auto; line-height: 1.6; }
+
+    .idea-form { display: flex; flex-direction: column; gap: 1.25rem; }
+
+    .input-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; }
+    .input-group { display: flex; flex-direction: column; gap: 0.3rem; }
+    .input-group label { font-size: 0.75rem; font-weight: 600; color: #64748b; letter-spacing: 0.04em; text-transform: uppercase; }
+    .input-group input {
+      width: 100%; padding: 0.65rem 0.85rem;
+      background: #f8fafc; border: 1px solid #e2e8f0;
+      border-radius: 10px; color: #1e293b; font-size: 0.88rem; font-family: inherit;
+      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .input-group input::placeholder { color: #94a3b8; }
+    .input-group input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+
+    textarea#user_input {
+      width: 100%; min-height: 110px; padding: 0.9rem 1rem;
+      background: #f8fafc; border: 1px solid #e2e8f0;
+      border-radius: 12px; color: #1e293b; font-size: 0.88rem;
+      font-family: inherit; line-height: 1.6; resize: vertical;
+      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    textarea#user_input::placeholder { color: #94a3b8; }
+    textarea#user_input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+
+    .form-footer { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+
+    .hint-chips { display: flex; flex-wrap: wrap; gap: 0.4rem; flex: 1; }
+    .hint-chip {
+      font-size: 0.75rem; color: #64748b;
+      background: #f1f5f9; border: 1px solid #e2e8f0;
+      border-radius: 100px; padding: 0.28rem 0.75rem;
+      cursor: pointer; transition: all 0.15s; user-select: none;
+    }
+    .hint-chip:hover { color: #2563eb; border-color: #bfdbfe; background: #eff6ff; }
+
+    .submit-btn {
+      display: inline-flex; align-items: center; gap: 0.45rem;
+      padding: 0.6rem 1.3rem; flex-shrink: 0;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      border: none; border-radius: 10px; color: #fff;
+      font-size: 0.85rem; font-weight: 600; font-family: inherit;
+      cursor: pointer; transition: opacity 0.2s, transform 0.15s;
+      box-shadow: 0 4px 16px rgba(37,99,235,0.25);
+    }
+    .submit-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+    .submit-btn:active { transform: translateY(0); }
+    .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    /* -- Loading overlay -- */
+    .loading-overlay { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(248,250,252,0.9); backdrop-filter: blur(8px); flex-direction: column; align-items: center; justify-content: center; gap: 1.25rem; }
+    .loading-overlay.active { display: flex; }
+    .spinner { width: 36px; height: 36px; border: 3px solid #e2e8f0; border-top-color: #2563eb; border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { color: #64748b; font-size: 0.85rem; }
+
+    /* -- Result layout -- */
+    .result-grid { display: grid; grid-template-columns: 220px 1fr; gap: 1rem; align-items: start; }
+
+    /* -- Profile sidebar -- */
+    .profile-sidebar { position: sticky; top: 1.5rem; }
+    .profile-card { text-align: center; }
+    .profile-card .bmi-value { font-size: 2rem; font-weight: 700; color: #2563eb; line-height: 1; }
+    .profile-card .bmi-label { font-size: 0.7rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; margin-top: 0.25rem; }
+    .profile-card .bmi-category { display: inline-block; margin-top: 0.6rem; font-size: 0.72rem; font-weight: 600; color: #2563eb; background: #eff6ff; border-radius: 100px; padding: 0.2rem 0.7rem; }
+    .profile-stats { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid #e2e8f0; }
+    .profile-stat { display: flex; justify-content: space-between; align-items: center; }
+    .profile-stat .ps-label { font-size: 0.75rem; color: #94a3b8; }
+    .profile-stat .ps-value { font-size: 0.82rem; font-weight: 600; color: #1e293b; }
+
+    /* -- Result cards -- */
+    .result-header-card { margin-bottom: 0.25rem; }
+    .result-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #2563eb; margin-bottom: 0.35rem; }
+    .result-title { font-size: 1.3rem; font-weight: 700; color: #0f172a; letter-spacing: -0.02em; }
+    .result-idea { margin-top: 0.5rem; font-size: 0.82rem; color: #64748b; line-height: 1.5; }
+
+    .section-heading { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #2563eb; margin-bottom: 0.6rem; }
+
+    .section-body { font-size: 0.88rem; line-height: 1.7; color: #475569; }
+    .section-body h1,.section-body h2,.section-body h3 { color: #0f172a; font-weight: 600; margin: 0.75rem 0 0.35rem; }
+    .section-body p { margin-bottom: 0.5rem; }
+    .section-body p:last-child { margin-bottom: 0; }
+    .section-body ul,.section-body ol { padding-left: 1.2rem; margin-bottom: 0.5rem; }
+    .section-body li { margin-bottom: 0.2rem; }
+    .section-body strong { color: #1e293b; }
+
+    /* -- Data table -- */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    .data-table th { background: #eff6ff; padding: 0.5rem 0.6rem; text-align: left; color: #2563eb; font-weight: 600; border-bottom: 1px solid #e2e8f0; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; }
+    .data-table td { padding: 0.45rem 0.6rem; border-bottom: 1px solid #f1f5f9; color: #475569; }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: #f8fafc; }
+
+    /* -- Stat cards row -- */
+    .stat-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 0.6rem; margin-bottom: 0.25rem; }
+    .stat-card {
+      padding: 0.9rem; text-align: center;
+      background: #eff6ff; border: 1px solid #bfdbfe;
+      border-radius: 12px;
+    }
+    .stat-card .stat-value { font-size: 1.25rem; font-weight: 700; color: #2563eb; }
+    .stat-card .stat-label { font-size: 0.68rem; color: #64748b; margin-top: 0.2rem; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    /* -- New plan button -- */
+    .new-plan-btn {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      padding: 0.5rem 1rem; margin-top: 1.25rem;
+      background: #fff; border: 1px solid #e2e8f0;
+      border-radius: 10px; color: #64748b; font-size: 0.8rem;
+      font-family: inherit; cursor: pointer; transition: all 0.15s;
+      text-decoration: none;
+    }
+    .new-plan-btn:hover { color: #2563eb; border-color: #bfdbfe; background: #eff6ff; }
+
+    @media (max-width: 700px) {
+      .input-row { grid-template-columns: 1fr; }
+      .result-grid { grid-template-columns: 1fr; }
+      .profile-sidebar { position: static; }
+      .form-footer { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text">Analyzing your profile...</div>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="logo">W</div>
+    <div class="header-title">Workout Advisor</div>
+    <div class="badge">
+      <span class="badge-dot"></span>
+      {{ model }}
+    </div>
+  </header>
+
+  <main>
+    <div class="content">
+
+      {% if not response %}
+      <!-- ====== FORM STATE ====== -->
+      <div class="form-hero">
+        <h1>Your AI <span>Fitness Advisor</span></h1>
+        <p>Enter your body stats and describe your goals. Get a personalized workout plan, nutrition guide, or fitness assessment instantly.</p>
+      </div>
+
+      <div class="card">
+        <form class="idea-form" method="POST" action="/workout-advisor/" id="advisorForm">
+          <div class="input-row">
+            <div class="input-group">
+              <label for="weight">Weight (kg)</label>
+              <input type="number" id="weight" name="weight" placeholder="70" step="0.1" required />
+            </div>
+            <div class="input-group">
+              <label for="height">Height (cm)</label>
+              <input type="number" id="height" name="height" placeholder="175" step="0.1" required />
+            </div>
+            <div class="input-group">
+              <label for="age">Age</label>
+              <input type="number" id="age" name="age" placeholder="25" required />
+            </div>
+          </div>
+
+          <textarea
+            id="user_input"
+            name="user_input"
+            placeholder="Describe your fitness goals and any limitations..."
+            required
+          ></textarea>
+
+          <div class="form-footer">
+            <div class="hint-chips">
+              <span class="hint-chip" onclick="fillHint('I want to lose weight but I have a knee injury. I can work out 3 days a week at home with no equipment.')">Weight loss + knee injury</span>
+              <span class="hint-chip" onclick="fillHint('I want to build muscle mass. I go to the gym 5 days a week and have access to full equipment.')">Build muscle (gym)</span>
+              <span class="hint-chip" onclick="fillHint('I need a meal plan for cutting. I want high protein, around 1800 calories per day.')">Cutting meal plan</span>
+              <span class="hint-chip" onclick="fillHint('What is my current fitness level based on my BMI? Give me an honest assessment.')">Fitness assessment</span>
+            </div>
+            <button type="submit" class="submit-btn" id="submitBtn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+              </svg>
+              Get Advice
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {% else %}
+      <!-- ====== RESULT STATE ====== -->
+      <div class="result-grid">
+
+        <!-- Left: Profile sidebar -->
+        <div class="profile-sidebar">
+          <div class="card profile-card">
+            <div class="bmi-value">{{ bmi.bmi }}</div>
+            <div class="bmi-label">BMI Index</div>
+            <div class="bmi-category">{{ bmi.category }}</div>
+            <div class="profile-stats">
+              <div class="profile-stat">
+                <span class="ps-label">Weight</span>
+                <span class="ps-value">{{ weight }} kg</span>
+              </div>
+              <div class="profile-stat">
+                <span class="ps-label">Height</span>
+                <span class="ps-value">{{ height }} cm</span>
+              </div>
+              <div class="profile-stat">
+                <span class="ps-label">Age</span>
+                <span class="ps-value">{{ age }} yrs</span>
+              </div>
+            </div>
+          </div>
+          <a href="/workout-advisor/" class="new-plan-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>
+            </svg>
+            New Plan
+          </a>
+        </div>
+
+        <!-- Right: Results -->
+        <div class="result-main">
+          <div class="card result-header-card">
+            <div class="result-label">
+              {% if response.intent == 'workout_plan' %}Workout Plan
+              {% elif response.intent == 'nutrition_plan' %}Nutrition Plan
+              {% elif response.intent == 'assessment' %}Fitness Assessment
+              {% elif response.intent == 'general_knowledge' %}Fitness Knowledge
+              {% else %}Response{% endif %}
+            </div>
+            <div class="result-title">Your Personalized Advice</div>
+            {% if user_input %}
+            <div class="result-idea">{{ user_input }}</div>
+            {% endif %}
+          </div>
+
+          {% if response.intent == 'workout_plan' and response.workout_plan %}
+          <!-- ---- Workout Plan ---- -->
+          <div class="card">
+            <div class="section-heading">Goal</div>
+            <div class="section-body"><p>{{ response.workout_plan.goal_summary }}</p></div>
+          </div>
+
+          <div class="card">
+            <div class="section-heading">Weekly Schedule</div>
+            <div class="section-body"><p>{{ response.workout_plan.weekly_schedule }}</p></div>
+          </div>
+
+          <div class="card">
+            <div class="section-heading">Exercises</div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Exercise</th>
+                  <th>Muscle</th>
+                  <th>Equipment</th>
+                  <th>Reps</th>
+                  <th>Sets</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for w in response.workout_plan.workouts %}
+                <tr>
+                  <td>{{ w.workout_name }}</td>
+                  <td>{{ w.muscle_group }}</td>
+                  <td>{{ w.equipment_needed }}</td>
+                  <td>{{ w.reps_or_duration }}</td>
+                  <td>{{ w.sets }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card">
+            <div class="section-heading">Tips</div>
+            <div class="section-body"><p>{{ response.workout_plan.key_tips }}</p></div>
+          </div>
+
+          {% elif response.intent == 'nutrition_plan' and response.nutrition_plan %}
+          <!-- ---- Nutrition Plan ---- -->
+          <div class="stat-row">
+            <div class="stat-card">
+              <div class="stat-value">{{ response.nutrition_plan.calorie_target }}</div>
+              <div class="stat-label">Daily Calories</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="section-heading">Macros</div>
+            <div class="section-body"><p>{{ response.nutrition_plan.macros_breakdown }}</p></div>
+          </div>
+
+          <div class="card">
+            <div class="section-heading">Sample Meals</div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Meal</th>
+                  <th>Cal</th>
+                  <th>Protein</th>
+                  <th>Carbs</th>
+                  <th>Fats</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for m in response.nutrition_plan.meals %}
+                <tr>
+                  <td>{{ m.meal_name }}</td>
+                  <td>{{ m.calories }}</td>
+                  <td>{{ m.protein_g }}g</td>
+                  <td>{{ m.carbs_g }}g</td>
+                  <td>{{ m.fats_g }}g</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+
+          <div class="card">
+            <div class="section-heading">Foods to Prioritize</div>
+            <div class="section-body"><p>{{ response.nutrition_plan.foods_to_prioritize }}</p></div>
+          </div>
+
+          <div class="card">
+            <div class="section-heading">Foods to Avoid</div>
+            <div class="section-body"><p>{{ response.nutrition_plan.foods_to_avoid }}</p></div>
+          </div>
+
+          {% elif response.free_response %}
+          <!-- ---- Free response ---- -->
+          <div class="card">
+            <div class="section-body">{{ response.free_response | safe }}</div>
+          </div>
+          {% endif %}
+
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+  </main>
+
+  <script>
+    function fillHint(text) {
+      document.getElementById('user_input').value = text;
+      document.getElementById('user_input').focus();
+    }
+
+    const form = document.getElementById('advisorForm');
+    if (form) {
+      form.addEventListener('submit', function () {
+        document.getElementById('loadingOverlay').classList.add('active');
+        document.getElementById('submitBtn').disabled = true;
+      });
+    }
+  </script>
+</body>
+</html>
