@@ -229,6 +229,15 @@
             </div>
           </div>
 
+          <div class="input-group">
+            <label for="gender">Gender</label>
+            <select id="gender" name="gender" required style="width: 100%; padding: 0.65rem 0.85rem; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; color: #1e293b; font-size: 0.88rem; font-family: inherit; outline: none; transition: border-color 0.2s, box-shadow 0.2s;">
+              <option value="" disabled selected>Select gender</option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+            </select>
+          </div>
+
           <textarea
             id="user_input"
             name="user_input"
@@ -264,6 +273,10 @@
             <div class="bmi-label">BMI Index</div>
             <div class="bmi-category">{{ bmi.category }}</div>
             <div class="profile-stats">
+              <div class="profile-stat">
+                <span class="ps-label">Gender</span>
+                <span class="ps-value">{{ gender|capitalize }}</span>
+              </div>
               <div class="profile-stat">
                 <span class="ps-label">Weight</span>
                 <span class="ps-value">{{ weight }} kg</span>
@@ -311,7 +324,24 @@
 
           <div class="card">
             <div class="section-heading">Weekly Schedule</div>
-            <div class="section-body"><p>{{ response.workout_plan.weekly_schedule }}</p></div>
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Day</th>
+                  <th>Workout</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for day in response.workout_plan.weekly_schedule %}
+                <tr>
+                  <td><strong>{{ day.day }}</strong></td>
+                  <td>{{ day.workout_group }}</td>
+                  <td>{{ day.notes }}</td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
           </div>
 
           <div class="card">

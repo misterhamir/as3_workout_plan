@@ -17,23 +17,29 @@ workout_router = APIRouter(prefix="/workout-advisor", tags=["workout-advisor"])
 
 
 class Exercise(BaseModel):
-    exercise_name: str = Field(description="Specific name of the exercise (e.g., push up, squat, lateral pull down, sit up, bench press, lunges)")
-    muscle_group: str = Field(description="Primary muscle group targeted by the exercise")
-    equipment_needed: str = Field(description="Equipment required for the exercise (e.g., dumbbells, barbell, pull-up bar, bodyweight)")
-    reps_or_duration: int = Field(description="Recommended number of repetitions or duration in seconds")
-    sets: int = Field(description="Number of sets to perform")
+    exercise_name: str = Field(description="Specific exercise name (push up, squat, bench press, etc.)")
+    muscle_group: str = Field(description="Primary muscle group")
+    equipment_needed: str = Field(description="Equipment needed or 'bodyweight'")
+    reps_or_duration: int = Field(description="Reps or seconds")
+    sets: int = Field(description="Number of sets")
 
 
 class WorkoutGroup(BaseModel):
-    group_name: str = Field(description="Name of the workout group/category (e.g., Upper Body Strength, Lower Body Power, Core & Abs, Cardio)")
-    exercises: list[Exercise] = Field(description="List of specific exercises in this workout group")
+    group_name: str = Field(description="Category name (Upper Body, Lower Body, Core, Cardio)")
+    exercises: list[Exercise] = Field(description="3-5 specific exercises")
+
+
+class DaySchedule(BaseModel):
+    day: str = Field(description="Day name (Monday, Tuesday, etc.)")
+    workout_group: str = Field(description="Workout group name or 'Rest Day'")
+    notes: str = Field(description="Brief notes for the day")
 
 
 class WorkoutPlan(BaseModel):
-    goal_summary: str = Field(description="One sentence describing the fitness goal")
-    weekly_schedule: str = Field(description="Structured breakdown of workouts by day (e.g., 'Monday: Upper Body Strength, Tuesday: Rest, Wednesday: Lower Body Power...')")
-    workout_groups: list[WorkoutGroup] = Field(description="List of workout groups with their specific exercises")
-    key_tips: str = Field(description="Important advice for the workout plan")
+    goal_summary: str = Field(description="1 sentence goal")
+    weekly_schedule: list[DaySchedule] = Field(description="7-day schedule")
+    workout_groups: list[WorkoutGroup] = Field(description="2-4 workout groups max")
+    key_tips: str = Field(description="Brief advice")
 
 
 class Meal(BaseModel):
@@ -70,11 +76,12 @@ def post_workout_advisor(
     weight: float = Form(...),
     height: float = Form(...),
     age: int = Form(...),
+    gender: str = Form(...),
     user_input: str = Form(...),
 ):
-    bmi_data = calculate_bmi(weight, height)
+    bmi_data = calculate_bmi(weight, height, gender)
     user_message = (
-        f"User profile: {weight}kg, {height}cm, {age} years old, "
+        f"User profile: {gender}, {weight}kg, {height}cm, {age} years old, "
         f"BMI: {bmi_data['bmi']} ({bmi_data['category']})\n\n"
         f"Goals/limitations: {user_input}"
     )
@@ -106,5 +113,6 @@ def post_workout_advisor(
             "weight": weight,
             "height": height,
             "age": age,
+            "gender": gender,
         }
     )

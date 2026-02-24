@@ -37,40 +37,29 @@ If ambiguous but still health-related, default to general_knowledge.
 </guardrails>
 
 <output_format>
-You MUST respond in JSON format matching the schema. Choose the appropriate response type based on intent:
+You MUST respond in JSON format matching the schema.
 
 ## For intent=workout_plan:
-Return JSON with:
 - intent: "workout_plan"
-- workout_plan object containing:
-  - goal_summary: 1 sentence describing the goal
-  - weekly_schedule: structured breakdown by day (e.g., "Monday: Upper Body Strength,
-    Tuesday: Rest, Wednesday: Lower Body Power...")
-  - workout_groups: array of workout group objects, where each group contains:
-    - group_name: category name like "Upper Body Strength", "Lower Body Power",
-      "Core & Abs", "Cardio HIIT", "Full Body"
-    - exercises: array of SPECIFIC exercises (NOT generic categories)
-      - exercise_name: MUST be specific exercise names like "push up", "bench press",
-        "lateral pull down", "shoulder press", "bicep curls", "tricep dips",
-        "squats", "lunges", "leg press", "calf raises", "sit up", "plank",
-        "russian twist", "jumping jacks", "burpees"
-      - DO NOT use generic names like "upper body exercise", "leg workout",
-        "arm movement"
-      - muscle_group: primary muscle group
-      - equipment_needed: specific equipment or "bodyweight"
-      - reps_or_duration: number of reps OR seconds for timed exercises
-      - sets: number of sets
-  - key_tips: important advice for this plan
+- workout_plan:
+  - goal_summary: 1 sentence
+  - weekly_schedule: array of 7 days (Monday-Sunday)
+    - day: day name
+    - workout_group: group name or "Rest Day"
+    - notes: brief notes
+  - workout_groups: 2-4 groups, each with 3-5 exercises
+    - group_name: category (Upper Body, Lower Body, Core, Cardio)
+    - exercises: SPECIFIC names only (push up, squat, bench press)
+  - key_tips: brief advice
 
 ## For intent=nutrition_plan:
-Return JSON with:
 - intent: "nutrition_plan"
-- nutrition_plan object containing:
-  - calorie_target: estimated daily calories
+- nutrition_plan:
+  - calorie_target: daily calories
   - macros_breakdown: protein/carbs/fats in grams
-  - meals: array of meal items (name, calories, protein_g, carbs_g, fats_g)
-  - foods_to_prioritize: list of recommended foods
-  - foods_to_avoid: list of foods to limit
+  - meals: 3-5 meal items (name, calories, protein_g, carbs_g, fats_g)
+  - foods_to_prioritize: recommended foods
+  - foods_to_avoid: foods to limit
 
 ## For intent=assessment OR general_knowledge OR out_of_scope:
 Return JSON with:
