@@ -16,18 +16,23 @@ MODEL = "minimax/minimax-m2.5"
 workout_router = APIRouter(prefix="/workout-advisor", tags=["workout-advisor"])
 
 
-class Workout(BaseModel):
-    workout_name: str = Field(description="Name of the workout or exercise")
-    muscle_group: str = Field(description="Primary muscle group targeted by the workout")
-    equipment_needed: str = Field(description="Equipment required for the workout, if any")
+class Exercise(BaseModel):
+    exercise_name: str = Field(description="Specific name of the exercise (e.g., push up, squat, lateral pull down, sit up, bench press, lunges)")
+    muscle_group: str = Field(description="Primary muscle group targeted by the exercise")
+    equipment_needed: str = Field(description="Equipment required for the exercise (e.g., dumbbells, barbell, pull-up bar, bodyweight)")
     reps_or_duration: int = Field(description="Recommended number of repetitions or duration in seconds")
     sets: int = Field(description="Number of sets to perform")
 
 
+class WorkoutGroup(BaseModel):
+    group_name: str = Field(description="Name of the workout group/category (e.g., Upper Body Strength, Lower Body Power, Core & Abs, Cardio)")
+    exercises: list[Exercise] = Field(description="List of specific exercises in this workout group")
+
+
 class WorkoutPlan(BaseModel):
     goal_summary: str = Field(description="One sentence describing the fitness goal")
-    weekly_schedule: str = Field(description="Structured breakdown of workouts by day")
-    workouts: list[Workout] = Field(description="List of workout exercises")
+    weekly_schedule: str = Field(description="Structured breakdown of workouts by day (e.g., 'Monday: Upper Body Strength, Tuesday: Rest, Wednesday: Lower Body Power...')")
+    workout_groups: list[WorkoutGroup] = Field(description="List of workout groups with their specific exercises")
     key_tips: str = Field(description="Important advice for the workout plan")
 
 

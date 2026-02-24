@@ -316,28 +316,33 @@
 
           <div class="card">
             <div class="section-heading">Exercises</div>
-            <table class="data-table">
-              <thead>
-                <tr>
-                  <th>Exercise</th>
-                  <th>Muscle</th>
-                  <th>Equipment</th>
-                  <th>Reps</th>
-                  <th>Sets</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for w in response.workout_plan.workouts %}
-                <tr>
-                  <td>{{ w.workout_name }}</td>
-                  <td>{{ w.muscle_group }}</td>
-                  <td>{{ w.equipment_needed }}</td>
-                  <td>{{ w.reps_or_duration }}</td>
-                  <td>{{ w.sets }}</td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+            {% for group in response.workout_plan.workout_groups %}
+            <div style="margin-bottom: 1.5rem;">
+              <h4 style="color: #2563eb; font-size: 0.9rem; font-weight: 700; margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;">{{ group.group_name }}</h4>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Exercise</th>
+                    <th>Muscle</th>
+                    <th>Equipment</th>
+                    <th>Reps</th>
+                    <th>Sets</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for ex in group.exercises %}
+                  <tr>
+                    <td>{{ ex.exercise_name }}</td>
+                    <td>{{ ex.muscle_group }}</td>
+                    <td>{{ ex.equipment_needed }}</td>
+                    <td>{{ ex.reps_or_duration }}</td>
+                    <td>{{ ex.sets }}</td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+            {% endfor %}
           </div>
 
           <div class="card">

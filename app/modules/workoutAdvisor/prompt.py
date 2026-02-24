@@ -44,8 +44,22 @@ Return JSON with:
 - intent: "workout_plan"
 - workout_plan object containing:
   - goal_summary: 1 sentence describing the goal
-  - weekly_schedule: structured breakdown by day (e.g., "Monday: Upper Body, Tuesday: Rest...")
-  - workouts: array of workout items (name, muscle_group, equipment, reps_or_duration, sets)
+  - weekly_schedule: structured breakdown by day (e.g., "Monday: Upper Body Strength,
+    Tuesday: Rest, Wednesday: Lower Body Power...")
+  - workout_groups: array of workout group objects, where each group contains:
+    - group_name: category name like "Upper Body Strength", "Lower Body Power",
+      "Core & Abs", "Cardio HIIT", "Full Body"
+    - exercises: array of SPECIFIC exercises (NOT generic categories)
+      - exercise_name: MUST be specific exercise names like "push up", "bench press",
+        "lateral pull down", "shoulder press", "bicep curls", "tricep dips",
+        "squats", "lunges", "leg press", "calf raises", "sit up", "plank",
+        "russian twist", "jumping jacks", "burpees"
+      - DO NOT use generic names like "upper body exercise", "leg workout",
+        "arm movement"
+      - muscle_group: primary muscle group
+      - equipment_needed: specific equipment or "bodyweight"
+      - reps_or_duration: number of reps OR seconds for timed exercises
+      - sets: number of sets
   - key_tips: important advice for this plan
 
 ## For intent=nutrition_plan:
